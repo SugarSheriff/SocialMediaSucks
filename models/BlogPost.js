@@ -1,24 +1,51 @@
-module.exports = (sequelize, DataTypes) => {
-    const BlogPost = sequelize.define('BlogPost', {
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      content: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-    });
-  
-    BlogPost.associate = (models) => {
-      BlogPost.belongsTo(models.User, {
-        foreignKey: {
-          allowNull: false,
+// Imports Sequelize components
+const { Model, DataTypes } = require("sequelize");
+// Imports sequelize configs
+const sequelize = require("../config/connection");
+// Imports bcrypt
+const bcrypt = require("bcryptjs");
+
+// Makes User class extending Model
+class User extends Model {
+    checkPassword(loginPw) {
+        return bcryptjs.compareSync(loginPw, this.password);
+    }
+}
+
+User.init(
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+            autoIncrement: true,
         },
-        onDelete: 'CASCADE',
-      });
-    };
-  
-    return BlogPost;
-  };
-  
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+            validate: {
+                isEmail: true,
+            },
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                len: [8, 23],
+            },
+        },
+    },
+    {
+        hooks: {
+            beforeCreate: async (newUserData) => {
+                newUserData.password = await bcrypt.hash(newUserData.password, 10);
+                return newUserData;}
+            }
+    }
+)
