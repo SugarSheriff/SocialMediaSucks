@@ -3,8 +3,8 @@ const session = require('express-session');
 const passport = require('passport');
 const db = require('./models'); 
 const routes = require('./routes');
-const config = require('./config')
-
+const config = require('./config');
+const models = require('./models');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
