@@ -1,8 +1,9 @@
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-const db = require('./models'); // Sequelize models
+const db = require('./app/models'); 
 const routes = require('./routes');
+const config = require('./config')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,5 +43,3 @@ const dbDatabase = process.env.DB_DATABASE;
 const dbHost = process.env.DB_HOST;
 const sessionSecret = process.env.SESSION_SECRET;
 const port = process.env.PORT || 3000;
-
-// Use these variables in your application configuration as needed
