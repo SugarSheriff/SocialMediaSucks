@@ -1,4 +1,4 @@
-const db = require('../models');
+const db = require('../../models');
 
 module.exports = {
   // Create a new blog post

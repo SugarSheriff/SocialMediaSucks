@@ -1,6 +1,6 @@
 const passport = require('passport');
 const bcrypt = require('bcrypt');
-const db = require('../models');
+const db = require('../../models');
 
 module.exports = {
   // User registration
