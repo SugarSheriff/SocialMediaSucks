@@ -1,51 +1,43 @@
-// Imports Sequelize components
-const { Model, DataTypes } = require("sequelize");
-// Imports sequelize configs
-const sequelize = require("../config/connection");
-// Imports bcrypt
-const bcrypt = require("bcryptjs");
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../config/connection');
 
-// Makes User class extending Model
-class User extends Model {
-    checkPassword(loginPw) {
-        return bcryptjs.compareSync(loginPw, this.password);
-    }
-}
+class Blogpost extends Model {}
 
-User.init(
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-            autoIncrement: true,
-        },
-        name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-        },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-            validate: {
-                isEmail: true,
-            },
-        },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                len: [8, 23],
-            },
-        },
+Blogpost.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    {
-        hooks: {
-            beforeCreate: async (newUserData) => {
-                newUserData.password = await bcrypt.hash(newUserData.password, 10);
-                return newUserData;}
-            }
-    }
-)
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+    },
+    date_created: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "user",
+        key: "id",
+      },
+    },
+  },
+  {
+    sequelize,
+    timestamps: false,
+    freezeTableName: true,
+    underscored: true,
+    modelName: "blogpost",
+  }
+);
+
+module.exports = Blogpost;
