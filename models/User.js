@@ -1,45 +1,57 @@
-const { Model, DataTypes } = require("sequelize");
-const sequelize = require("../config/connection");
+const { DataTypes } = require('sequelize');
+const bcrypt = require('bcrypt');
 
-class BlogPost extends Model {}
+const sequelize = new Sequelize({
+  dialect: 'mysql',
+  host: 'your-database-host',
+  username: 'your-username',
+  password: 'your-password',
+  database: 'your-database-name',
+});
 
-BlogPost.init(
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-            autoIncrement: true,
-        },
-        title: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        contents: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-        },
-        date_created: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW,
-        },
-        user_id: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: "user",
-                key: "id",
-            },
-            onDelete: "SET NULL",
-        },
+const User = sequelize.define(
+  'User', // Model name
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    {
-        sequelize,
-        timestamps: false,
-        freezeTableName: true,
-        underscored: true,
-        modelName: "blogPost",
-    }
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
+      },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        len: [8, 23],
+      },
+    },
+  },
+  {
+    hooks: {
+      beforeCreate: async (newUserData) => {
+        newUserData.password = await bcrypt.hash(newUserData.password, 10);
+        return newUserData;
+      },
+    },
+  }
 );
 
-module.exports = BlogPost;
+// Sync the model with the database (this creates the "User" table)
+sequelize.sync({ force: false }).then(() => {
+  console.log('User model synced with the database.');
+});
+
+module.exports = User;
