@@ -1,16 +1,14 @@
-const { DataTypes } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
+const sequelize = require('../config/connection');
 
-const sequelize = new Sequelize({
-  dialect: 'mysql',
-  host: 'your-database-host',
-  username: 'your-username',
-  password: 'your-password',
-  database: 'your-database-name',
-});
+class User extends Model {
+  checkPassword(loginPw) {
+    return bcrypt.compareSync(loginPw, this.password);
+  }
+}
 
-const User = sequelize.define(
-  'User', // Model name
+User.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -21,7 +19,6 @@ const User = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     email: {
       type: DataTypes.STRING,
@@ -35,7 +32,7 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [8, 23],
+        len: [8],
       },
     },
   },
@@ -45,13 +42,17 @@ const User = sequelize.define(
         newUserData.password = await bcrypt.hash(newUserData.password, 10);
         return newUserData;
       },
+      beforeUpdate: async (updatedUserData) => {
+        updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+        return updatedUserData;
+      },
     },
-  }
+    sequelize,
+    timestamps: false,
+    freezeTableName: true,
+    underscored: true,
+    modelName: 'user',
+  },
 );
-
-// Sync the model with the database (this creates the "User" table)
-sequelize.sync({ force: false }).then(() => {
-  console.log('User model synced with the database.');
-});
 
 module.exports = User;
