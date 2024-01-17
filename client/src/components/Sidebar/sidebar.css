@@ -1,0 +1,17 @@
+.sidebar {
+    background-color: #8e44ad; /* Purple background color */
+    color: #ffffff; /* White text color */
+    padding: 1rem;
+  }
+  
+  .sidebar a {
+    color: #ffffff; /* White color for links */
+    text-decoration: none;
+    display: block;
+    padding: 0.5rem 0;
+  }
+  
+  .sidebar a:hover {
+    background-color: #6c3483; /* Darker purple on hover */
+  }
+    
